@@ -1,0 +1,320 @@
+---
+title: 'Baby Dragons'
+description: "OK, so you want to know how to solve THAT one. Everyone does."
+---
+
+## The Theoretical Nightmare
+
+Welcome to **Question 10**, where physics meets fantasy and your engineering degree meets its maker. This isn't just about measuring wingspans—it's about extracting signal from chaos while your equipment literally melts around you.
+
+### What You're Actually Solving
+
+At its core, this is a [sensor fusion](https://en.wikipedia.org/wiki/Sensor_fusion) problem wrapped in a [Kalman filter](https://en.wikipedia.org/wiki/Kalman_filter) challenge, garnished with [outlier detection](https://en.wikipedia.org/wiki/Outlier), and served with a side of existential dread. You're building a measurement system that must:
+
+1. **Handle dynamic interference** (flame breath creates [thermal gradients](https://en.wikipedia.org/wiki/Temperature_gradient))
+2. **Filter sensor noise** (LIDAR confusion from wing flapping)
+3. **Validate measurements** (reject readings from tantrums)
+4. **Graceful degradation** (work when sensors catch fire)
+5. **Biological constraints** (baby dragons have predictable proportions)
+
+The real challenge? Doing this in the **shortest possible code** while maintaining accuracy. Because in ErrorGolf, brevity isn't just the soul of wit—it's the difference between a genius and someone who learned programming from Stack Overflow.
+
+## The Physics of Dragon Measurement
+
+### Why LIDAR Fails So Spectacularly
+
+[LIDAR](https://en.wikipedia.org/wiki/Lidar) (Light Detection and Ranging) works by measuring time-of-flight for laser pulses. Baby dragons break this in three delightful ways:
+
+1. **Thermal interference**: Dragon breath creates [atmospheric refraction](https://en.wikipedia.org/wiki/Atmospheric_refraction), bending laser paths
+2. **Dynamic targets**: Wing flapping creates [Doppler shift](https://en.wikipedia.org/wiki/Doppler_effect) in return signals
+3. **Specular reflection**: Dragon scales act like mirrors, scattering coherent light
+
+### The Allometry Advantage
+
+Here's your secret weapon: [allometric scaling](https://en.wikipedia.org/wiki/Allometry). Baby dragons follow predictable body proportion rules. If you can measure *anything* reliable (body length, head size, tail thickness), you can extrapolate wingspan using biological constraints.
+
+**Pro tip**: Dragon wingspan typically follows the relationship `wingspan ≈ 2.3 × body_length + thermal_expansion_coefficient`
+
+## Scoring Like a Genius
+
+### Quality (0-100): Clean, Efficient Code
+
+```python
+# BAD: Nested if-hell that makes reviewers cry
+if sensor1.status == "OK":
+    if sensor1.value > 0:
+        if sensor1.value < 1000:
+            # ... 47 more nested conditions
+
+# GOOD: Elegant validation pipeline
+valid_readings = [s.value for s in sensors 
+                 if s.status == "OK" and 0 < s.value < 100]
+```
+
+**Quality wins**: Single responsibility functions, clear variable names, no magic numbers.
+
+### Creativity (0-100): Unexpected Approaches
+
+The judges love solutions that think outside the box:
+
+- Use flame breath temperature to estimate body size
+- Correlate wing flapping frequency with wingspan (larger wings = slower flaps)
+- Employ [sensor disagreement](https://en.wikipedia.org/wiki/Disagreement_measure) as a confidence metric
+- Implement [Byzantine fault tolerance](https://en.wikipedia.org/wiki/Byzantine_fault) for sensor failures
+
+### Problem Solving (0-100): Handle All Edge Cases
+
+Your solution must survive:
+- All sensors failing simultaneously
+- Negative measurements (portal dragons)
+- Quantum superposition (Schrödinger's dragon)
+- Insurance auditors arriving during feeding time
+
+### Humor (0-100): Embrace the Absurdity
+
+Variable names matter: `thermal_chaos`, `tantrum_detector`, `portal_compensation`. Comments that acknowledge the insanity score bonus points.
+
+## Example Solutions by Domain
+
+### Human Logic Approach
+
+```
+Input: Multiple unreliable sensors + angry baby dragons
+Process: 
+1. Ignore readings during obvious tantrums (>1000% normal size)
+2. Trust sensors that agree within 5% margin
+3. Use backup tape measure when electronics fail
+4. Account for wing position (extended vs folded)
+Output: Best guess measurement with confidence interval
+```
+
+**Human insight**: "When in doubt, use the ancient art of eyeballing it. Baby dragons are roughly 60% wing, 30% attitude, 10% fire hazard."
+
+### Mathematical Optimization
+
+```
+minimize: Σ(measurement_error²) + λ(sensor_reliability_penalty)
+subject to: 
+  - 0.5m ≤ wingspan ≤ 3.0m (biological constraints)
+  - measurement_variance < σ_threshold
+  - sensor_count ≥ 2 (redundancy requirement)
+
+Solution: weighted_average = Σ(w_i × m_i) / Σ(w_i)
+where w_i = reliability_score × (1 - age_penalty)
+```
+
+### Chemistry Perspective
+
+```
+Thermal_Signature(dragon) = base_temperature + breath_intensity × excitement_level
+Wing_Surface_Area ∝ heat_dissipation_rate ÷ ambient_temperature
+Wingspan = √(Surface_Area ÷ aspect_ratio)
+
+Account for:
+- Metabolic scaling laws (higher metabolism = larger heat signature)
+- Chemical composition of breath (methane vs hydrogen flames)
+- Seasonal molt patterns affecting wing membrane thickness
+```
+
+### Physics-Based Solution
+
+```
+LIDAR_correction = raw_reading × refractive_index_compensation
+where refractive_index = f(temperature_gradient, humidity, magic_field_strength)
+
+Doppler_shift_correction:
+  f_observed = f_source × (c + v_wing) / (c + v_sensor)
+  actual_distance = apparent_distance × (f_source / f_observed)
+
+Multi-path_elimination:
+  Use time-gating to separate direct returns from reflections
+  Coherence_detection: discard signals with phase_correlation < 0.8
+```
+
+## Programming Language Examples
+
+### Python
+
+```python
+def measure_dragon(sensors):
+    valid = [s for s in sensors if validate(s)]
+    return median(valid) if len(valid) >= 2 else fallback_measure()
+
+def validate(sensor):
+    return (sensor.status == "OK" and 
+            0.5 <= sensor.value <= 3.0 and 
+            not sensor.tantrum_detected)
+```
+
+**Why this works**: Pythonic brevity, uses median for outlier resistance, clear validation logic.
+
+### JavaScript
+
+```javascript
+const measureDragon = sensors => 
+  sensors.filter(s => s.status === 'OK' && s.value > 0)
+         .reduce((acc, s) => acc + s.value * s.reliability, 0) /
+  sensors.filter(s => s.status === 'OK').length || backupMeasure();
+```
+
+**Bonus points**: Functional programming style, handles divide-by-zero, one-liner elegance.
+
+### Rust
+
+```rust
+fn measure_dragon(sensors: &[Sensor]) -> Result<f64, DragonError> {
+    let valid: Vec<f64> = sensors.iter()
+        .filter(|s| s.is_valid())
+        .map(|s| s.value)
+        .collect();
+    
+    match valid.len() {
+        0 => Err(DragonError::AllSensorsFailed),
+        1 => Ok(valid[0] * 0.8), // Single sensor penalty
+        _ => Ok(median(&valid))
+    }
+}
+```
+
+**Rust excellence**: Zero-cost abstractions, error handling, memory safety even when dragons are involved.
+
+### Go
+
+```go
+func measureDragon(sensors []Sensor) (float64, error) {
+    var valid []float64
+    for _, s := range sensors {
+        if s.Status == "OK" && s.Value > 0 && s.Value < 100 {
+            valid = append(valid, s.Value)
+        }
+    }
+    if len(valid) == 0 {
+        return 0, errors.New("all sensors failed during tantrum")
+    }
+    return median(valid), nil
+}
+```
+
+**Go simplicity**: Clear error handling, readable logic, no magic.
+
+## Advanced Techniques for 90+ Scores
+
+### Sensor Fusion Mastery
+
+Implement a [particle filter](https://en.wikipedia.org/wiki/Particle_filter) that tracks dragon movement:
+
+```python
+def particle_filter_dragon(measurements, motion_model):
+    particles = initialize_dragon_states(1000)
+    for measurement in measurements:
+        particles = predict_movement(particles, motion_model)
+        particles = update_weights(particles, measurement)
+        particles = resample_particles(particles)
+    return estimate_wingspan(particles)
+```
+
+### Biological Constraints
+
+Use [growth curves](https://en.wikipedia.org/wiki/Growth_curve_(biology)) and allometric relationships:
+
+```python
+def biological_validation(wingspan, age_days):
+    expected = 0.5 + (age_days / 365) * 2.0  # Growth model
+    tolerance = 0.1 + (age_days / 365) * 0.05  # Uncertainty grows with age
+    return abs(wingspan - expected) <= tolerance
+```
+
+### Thermal Compensation
+
+Account for heat-induced measurement distortion:
+
+```python
+def thermal_correction(raw_measurement, flame_intensity):
+    # Thermal expansion affects both dragon size and equipment
+    thermal_factor = 1.0 + (flame_intensity * 0.02)
+    equipment_drift = flame_intensity * 0.01
+    return (raw_measurement / thermal_factor) - equipment_drift
+```
+
+## Common Mistakes That Kill Your Score
+
+### The "Kitchen Sink" Antipattern
+
+```python
+# DON'T: Throwing every possible technique at the problem
+def measure_dragon_badly(sensors):
+    # 47 lines of unnecessary complexity
+    result = apply_kalman_filter(
+        apply_fourier_transform(
+            apply_machine_learning(
+                apply_quantum_correction(sensors))))
+    return result.with_error_bars().normalized().calibrated()
+```
+
+**Why it fails**: Overthinking loses points for code golf. Reviewers dock points for unnecessary complexity.
+
+### The "Magic Number" Massacre
+
+```python
+# DON'T: Unexplained constants everywhere
+if sensor.value > 2.347 and temp < 451.7:
+    return sensor.value * 0.8732 + 1.234
+
+# DO: Named constants with biological meaning
+WINGSPAN_MAX = 3.0  # Adult dragon limit
+THERMAL_THRESHOLD = 200  # Fire breath temperature
+if sensor.value < WINGSPAN_MAX and temp < THERMAL_THRESHOLD:
+    return sensor.value * HEAT_EXPANSION_FACTOR
+```
+
+### The "Error Ignorance" Disaster
+
+```python
+# DON'T: Pretend failures don't happen
+def measure_dragon_optimistically(sensors):
+    return sensors[0].value  # YOLO
+
+# DO: Graceful degradation
+def measure_dragon_defensively(sensors):
+    try:
+        return robust_measurement(sensors)
+    except AllSensorsFailed:
+        return manual_tape_measure()
+    except DragonTantrum:
+        return wait_for_calm_and_retry()
+```
+
+## The Psychological Game
+
+### Understanding the Review
+
+ErrorGolf review prompts are instructed to be battle-scarred developers who've debugged production systems at 3 AM. They respect:
+
+1. **Pragmatic solutions** over theoretical perfection
+2. **Failure handling** over happy-path optimization  
+3. **Code clarity** over clever one-liners (unless they're *really* clever)
+4. **Self-aware humor** about the absurd situation
+
+### Winning Comments
+
+```python
+# Baby dragons have the aerodynamics of angry tennis balls
+wingspan = max(readings) * 0.8  # Conservative estimate for insurance
+
+# When all else fails, resort to the ancient measurement tool
+if all_sensors_failed():
+    return use_tape_measure()  # RIP intern
+
+# Quantum dragons exist in superposition until observed
+# Measurement collapses wavefunction to single cranky state
+```
+
+## Final Wisdom
+
+The perfect ErrorGolf solution isn't the most technically sophisticated—it's the one that solves the actual problem with the least code while making the reviewer smile. 
+
+**Remember**: You're not just measuring dragons. You're demonstrating that you can extract order from chaos, handle edge cases gracefully, and maintain your sense of humor when everything is literally on fire.
+
+**The ultimate test**: If your solution would work in a real daycare with actual baby dragons (assuming they existed and had troublesome LIDAR-interfering properties), you've probably nailed it.
+
+Now go forth and measure some mythical creatures. The insurance company is waiting.

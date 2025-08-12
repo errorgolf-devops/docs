@@ -14,13 +14,16 @@
         "tab": "For Eejits",
         "groups": [
           {
-            "group": "Basics",
+            "group": "Stuff Nobody Reads",
             "pages": [
               "index",
+              "wtf",
               "webhooks",
               "languages",
               "personalities",
-              "fasq"
+              "dragon",
+              "fasq",
+              "feedback"
             ]
           }
         ]

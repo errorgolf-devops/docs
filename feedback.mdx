@@ -1,0 +1,80 @@
+---
+title: 'Feedback, etc.'
+description: "If we wanted your feedback, we'd rent a shop"
+---
+
+## Bug Reports
+
+If something is actually broken (not just confusing), email us at `support@errorgolf.com` with:
+
+- What you were trying to do
+- What happened instead  
+- Any error messages (screenshots are fine, we're not monsters)
+
+"It doesn't work" is not a bug report. "Webhook returns 500 when payload contains special characters" is a bug report.
+
+## Feature Requests
+
+We built this because existing platforms suck. If you want the same features they have, just use them.
+
+That said, if you have a genuinely good idea that fits our "test creativity, not memorization" philosophy, we might listen.
+
+## API Questions
+
+Read the docs first. Seriously. The answer to "How do I validate a company code?" is literally on the API reference page.
+
+If you've actually read the documentation and still have questions, that's either:
+1. A documentation bug (our fault)
+2. An edge case we didn't think of (also our fault)
+3. You're trying to do something weird (probably your fault, but we're curious)
+
+## Integration Help
+
+**Before you email us:**
+- Did you test your webhook with our test button?
+- Are you verifying our HMAC signature correctly?
+- Are you handling both test and live payloads properly?
+- Did you check your server logs for actual error messages?
+
+**Common issues we're tired of debugging:**
+- Your firewall is blocking our webhooks
+- You're expecting form data instead of JSON
+- Your webhook secret has extra whitespace
+- You're returning 200 for internal errors
+
+## Philosophy Complaints
+
+If you think our questions are "too weird" or "not realistic," you've missed the point entirely. 
+
+Traditional tests measure how well someone memorized algorithms. Our tests measure how someone thinks when the requirements make no sense - which is basically every real software project.
+
+If you want FizzBuzz implementations, there are plenty of other platforms that will happily charge you $500/month for the privilege.
+
+## Billing Questions
+
+You pay $49 once, then $39 every time someone submits an assessment. This is not complicated.
+
+If Stripe declined your card, that's between you and Stripe. We're not customer service for your bank.
+
+## Response Times
+
+We'll respond to actual technical issues within 24 hours (usually much faster).
+
+We won't respond to:
+- "Can you add support for my obscure ATS?"
+- "Why don't you have more traditional programming questions?"
+- "Can you make this work like [insert competitor name]?"
+
+## The Nuclear Option
+
+If our platform fundamentally doesn't work for your hiring process, just use something else. We're not trying to be everything to everyone.
+
+We built this for companies that want to find creative problem-solvers, not companies that want to test sorting algorithms.
+
+## Contact Info
+
+**Technical Issues:** `support@errorgolf.com`
+
+**Everything Else:** Read the docs again, then maybe don't email us.
+
+**Sales Questions:** There's no sales team, and you hate them anyway. You pay $49, you get a company code. We're super friendly when you have a problem.
