@@ -1,216 +1,3092 @@
-{
-  "openapi": "3.1.0",
+﻿{
+  "openapi": "3.0.3",
   "info": {
-    "title": "OpenAPI Plant Store",
-    "description": "A sample API that uses a plant store as an example to demonstrate features in the OpenAPI specification",
-    "license": {
-      "name": "MIT"
+    "title": "Error Golf API - Where Code Goes to Die",
+    "description": "# 🏌️ Error Golf API\n\n**Error Golf** replaces algorithmic tests with creative coding challenges that actually measure problem-solving skills.\nCompanies pay $39 per candidate to discover if applicants can think creatively or just copy-paste from Stack Overflow.\n\n## Business Model\n- **Setup Fee:** $49 one-time fee (because quality costs money)\n- **Per Candidate:** $39 each attempt (cheaper than a decent lunch)\n- **No Subscriptions:** We're not Netflix\n\n## Golf Terminology\n- **Round:** Complete test (3 questions, like actual golf but with more crying)\n- **Hole:** Individual question (candidates pick 3 from 100 nightmares)\n- **Shot:** Solution attempt (usually involves existential crisis)\n- **Scorecard:** A roast of your code from 3 different personalities\n\n## Authentication\nProtected endpoints need JWT Bearer token: `Bearer <your-digital-passport>`\n\n## Error Responses\nWhen things inevitably break:\n```json\n{\n  \"error\": \"something_went_sideways\",\n  \"message\": \"A helpful explanation of what you did wrong this time\"\n}\n```\n\n## Rate Limiting\n- 100 requests/hour (generous, considering your coding skills)\n- Headers tell you when we'll start ignoring you\n",
+    "version": "1.0.0",
+    "contact": {
+      "name": "Error Golf Support (May the odds be ever in your favor)",
+      "url": "https://errorgolf.com/support",
+      "email": "support@errorgolf.com"
     },
-    "version": "1.0.0"
+    "license": {
+      "name": "Proprietary (We own this beautiful mess)",
+      "url": "https://errorgolf.com/terms"
+    }
   },
   "servers": [
     {
-      "url": "http://sandbox.mintlify.com"
+      "url": "https://api.errorgolf.com/v1",
+      "description": "Production (where dreams meet reality)"
+    },
+    {
+      "url": "http://localhost:8080/v1",
+      "description": "Local dev (your personal playground)"
     }
   ],
-  "security": [
+  "tags": [
     {
-      "bearerAuth": []
+      "name": "Health",
+      "description": "Is this thing even working?"
+    },
+    {
+      "name": "Course",
+      "description": "Browse the vault of coding nightmares"
+    },
+    {
+      "name": "Round",
+      "description": "Take 3 swings at holes you pick"
+    },
+    {
+      "name": "Members",
+      "description": "Prove you belong here"
+    },
+    {
+      "name": "Clubhouse",
+      "description": "Configure your coding challenge empire"
     }
   ],
   "paths": {
-    "/plants": {
+    "/": {
       "get": {
-        "description": "Returns all plants from the system that the user has access to",
+        "tags": [
+          "Health"
+        ],
+        "summary": "Basic pulse check",
+        "description": "Confirms the API hasn't rage-quit yet",
+        "responses": {
+          "200": {
+            "description": "Still alive and kicking",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "🏌️ Error Golf API"
+                    },
+                    "status": {
+                      "type": "string",
+                      "example": "running"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/healthcheck": {
+      "get": {
+        "tags": [
+          "Health"
+        ],
+        "summary": "Comprehensive system checkup",
+        "description": "Full health report - like a physical exam but for APIs.\nYour monitoring tools will appreciate this more than your developers appreciate code reviews.\n",
+        "responses": {
+          "200": {
+            "description": "Everything's working (miracles do happen)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "healthy"
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "database": {
+                      "type": "string",
+                      "example": "connected"
+                    },
+                    "version": {
+                      "type": "string",
+                      "example": "1.0.0"
+                    },
+                    "outage": {
+                      "type": "object",
+                      "properties": {
+                        "course": {
+                          "type": "boolean"
+                        },
+                        "clubhouse": {
+                          "type": "boolean"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerExistentialCrisis"
+          }
+        }
+      }
+    },
+    "/holes": {
+      "get": {
+        "tags": [
+          "Course"
+        ],
+        "summary": "Browse the vault of coding nightmares",
+        "description": "## Question Library Browser\n\nBrowse all 100 questions in the Error Golf vault. Perfect for candidates selecting their poison or companies previewing the chaos they're about to unleash.\n\n**Key Features:**\n- **Public API:** No authentication required (the suffering is free to preview)\n- **Choices Filter:** Override pagination to show specific questions (perfect for assessment interface)\n- **Full Metadata:** Difficulty, category, hints, and example solutions included\n\n**Filtering with choices parameter:**\n- `?choices=1,42,78` returns only questions 1, 42, and 78\n- Overrides normal pagination when provided\n- Invalid IDs silently ignored (we're merciful)\n- Perfect for assessment screens where candidates select their 3 questions\n\n**Sorting options:**\n- `id` - Question number (default ascending)\n- `title` - Alphabetical by question title\n- `category` - Group by difficulty category\n- `difficulty` - Sort by pain level (1-10 scale)\n",
         "parameters": [
           {
-            "name": "limit",
+            "name": "page",
             "in": "query",
-            "description": "The maximum number of results to return",
             "schema": {
               "type": "integer",
-              "format": "int32"
-            }
+              "minimum": 1,
+              "default": 1
+            },
+            "description": "Page number for pagination (ignored if choices provided)"
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 15
+            },
+            "description": "Results per page (max 100, ignored if choices provided)"
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "id",
+                "title",
+                "category",
+                "difficulty"
+              ],
+              "default": "id"
+            },
+            "description": "Field to sort by"
+          },
+          {
+            "name": "dir",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "default": "asc"
+            },
+            "description": "Sort direction"
+          },
+          {
+            "name": "choices",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9]+(,[0-9]+)*$"
+            },
+            "description": "Comma-separated question IDs to filter (overrides pagination)",
+            "example": "1,42,78"
           }
         ],
         "responses": {
           "200": {
-            "description": "Plant response",
+            "description": "Questions retrieved successfully",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Plant"
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/QuestionPublic"
+                      },
+                      "description": "Array of questions (variation A content only)"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/PaginationMeta"
+                    },
+                    "links": {
+                      "$ref": "#/components/schemas/PaginationLinks"
+                    }
+                  }
+                },
+                "examples": {
+                  "normal_pagination": {
+                    "summary": "Normal paginated response",
+                    "value": {
+                      "data": [
+                        {
+                          "id": 1,
+                          "title": "Midlife Crisis Sports Car Database",
+                          "category": "intermediate",
+                          "difficulty": 5,
+                          "description": "A car dealership system specifically targets men experiencing existential dread...",
+                          "human": {
+                            "input_format": "Customer crisis indicators and financial constraints",
+                            "output_format": "Vehicle recommendation with ethical boundaries",
+                            "examples": {
+                              "input": "47-year-old, advanced hair loss, recent divorce, liquidated 401k",
+                              "output": "Certified Corvette, preserve some retirement, no flame decals"
+                            }
+                          }
+                        }
+                      ],
+                      "meta": {
+                        "page": {
+                          "current-page": 1,
+                          "per-page": 15,
+                          "from": 1,
+                          "to": 15,
+                          "total": 100,
+                          "last-page": 7
+                        }
+                      },
+                      "links": {
+                        "first": "https://api.errorgolf.com/questions?page=1&per_page=15&sort=id&dir=asc",
+                        "next": "https://api.errorgolf.com/questions?page=2&per_page=15&sort=id&dir=asc",
+                        "last": "https://api.errorgolf.com/questions?page=7&per_page=15&sort=id&dir=asc"
+                      }
+                    }
+                  },
+                  "choices_filter": {
+                    "summary": "Using choices filter for assessment",
+                    "value": {
+                      "data": [
+                        {
+                          "id": 1,
+                          "title": "Midlife Crisis Sports Car Database"
+                        },
+                        {
+                          "id": 42,
+                          "title": "Academic Tenure Battle Algorithm"
+                        },
+                        {
+                          "id": 78,
+                          "title": "Dating App Algorithmic Optimization"
+                        }
+                      ],
+                      "meta": {
+                        "page": {
+                          "current-page": 1,
+                          "per-page": 3,
+                          "from": 1,
+                          "to": 3,
+                          "total": 3,
+                          "last-page": 1
+                        }
+                      }
+                    }
                   }
                 }
               }
             }
           },
           "400": {
-            "description": "Unexpected error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "description": "Creates a new plant in the store",
-        "requestBody": {
-          "description": "Plant to add to the store",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/NewPlant"
-              }
-            }
+            "$ref": "#/components/responses/BadRequest"
           },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "plant response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Plant"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "unexpected error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
+          "500": {
+            "$ref": "#/components/responses/ServerExistentialCrisis"
           }
         }
       }
     },
-    "/plants/{id}": {
-      "delete": {
-        "description": "Deletes a single plant based on the ID supplied",
+    "/hole/{id}": {
+      "get": {
+        "tags": [
+          "Course"
+        ],
+        "summary": "Individual question deep dive",
+        "description": "## Single Question Details\n\nGet complete details for a specific question from the vault. Perfect for previewing what fresh programming nightmare awaits.\n\n**What you get:**\n- Complete question metadata and backstory\n- All format variations (human, math, chemistry, physics, programming)\n- Example solutions and hints (variation A only)\n- Pass/fail conditions for evaluation\n- Difficulty rating and category classification\n\n**Question formats available:**\n- **Human:** Natural language problem description\n- **Math:** Mathematical notation and formulas\n- **Chemistry:** Chemical equations and reactions\n- **Physics:** Physical laws and calculations\n- **Programming:** Code-specific requirements\n",
         "parameters": [
           {
             "name": "id",
             "in": "path",
-            "description": "ID of plant to delete",
             "required": true,
             "schema": {
               "type": "integer",
-              "format": "int64"
-            }
+              "minimum": 1,
+              "maximum": 100
+            },
+            "description": "Question ID (1-100)",
+            "example": 42
           }
         ],
         "responses": {
-          "204": {
-            "description": "Plant deleted",
-            "content": {}
-          },
-          "400": {
-            "description": "unexpected error",
+          "200": {
+            "description": "Question details retrieved",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error"
+                  "$ref": "#/components/schemas/QuestionPublic"
+                },
+                "example": {
+                  "id": 1,
+                  "title": "Midlife Crisis Sports Car Database",
+                  "category": "intermediate",
+                  "difficulty": 5,
+                  "description": "A car dealership system specifically targets men experiencing existential dread with algorithmically optimized mid-life crisis vehicles...",
+                  "explanation": "This is a recommendation algorithm with moral guardrails—the kind of system that makes you question humanity while writing perfectly clean code...",
+                  "example_solution": {
+                    "human": {
+                      "code": "Balding + divorce = Corvette. Hair plugs + yoga = BMW. Safety: no financing if mentions 'showing my ex'."
+                    },
+                    "math": {
+                      "code": "C=hair_loss×0.3+divorce×0.4+teen_shame×0.3; if C>0.8: intervention_mode"
+                    },
+                    "programming": {
+                      "language": "F#",
+                      "code": "let rec(h,d,t)=match h,d with|High,true->Corvette|Med,false->Sedan|_->Therapy"
+                    }
+                  },
+                  "pass_conditions": {
+                    "minimum": [
+                      "Recommends appropriate vehicles based on desperation levels",
+                      "Prevents financial suicide (retirement fund protection)"
+                    ]
+                  },
+                  "failure_conditions": {
+                    "automatic": [
+                      "Recommends Lamborghini to guy making $40k",
+                      "Ignores wife's veto power completely"
+                    ]
+                  },
+                  "human": {
+                    "input_format": "Customer crisis indicators and financial constraints",
+                    "output_format": "Vehicle recommendation with ethical boundaries",
+                    "examples": {
+                      "input": "47-year-old, advanced hair loss, recent divorce, liquidated 401k",
+                      "output": "Certified Corvette, preserve some retirement, no flame decals"
+                    }
+                  },
+                  "hints": [
+                    "Hair loss + divorce = convertible preference (it's science)",
+                    "Leather pants purchase = code red intervention needed"
+                  ],
+                  "edge_cases": [
+                    "Customer already owns Corvette but wants another (addiction protocol)",
+                    "Wife approves the purchase (suspicious, investigate further)"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid question ID",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "invalid_id",
+                  "message": "Question ID must be between 1 and 100"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Question not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "question_not_found",
+                  "message": "Question not found"
+                }
+              }
+            }
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerExistentialCrisis"
+          }
+        }
+      }
+    },
+    "/signup": {
+      "post": {
+        "tags": [
+          "Members"
+        ],
+        "summary": "Join the club",
+        "description": "## Company Registration Process\n\nRegister your company and start testing whether your candidates can actually code.\n\n**What happens:**\n1. We take your money ($49 because good things aren't free)\n2. Generate your magical company codes\n3. Email you credentials you'll immediately forget\n4. You begin questioning your hiring process\n\n**Your new codes:**\n- **Live Code:** Starts with 0-9, costs $39 per candidate completion\n- **Test Code:** Starts with 'T', free sandbox for webhook testing\n\n**Notes:**\n- Discount codes are case-insensitive (we're not monsters)\n- Referral codes reduce fees (sharing is caring)\n- Payment failures = no account (shocking, we know)\n",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "name",
+                  "email",
+                  "payment_token"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "maxLength": 100,
+                    "description": "Company name (appears on invoices and employee nightmares)",
+                    "example": "TechCorp Solutions"
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "maxLength": 255,
+                    "description": "Email address (must be unique, like your coding style)",
+                    "example": "hiring@techcorp.com"
+                  },
+                  "referral": {
+                    "type": "string",
+                    "maxLength": 50,
+                    "description": "Referral code (someone actually recommended this?)",
+                    "example": "DEV001"
+                  },
+                  "discount": {
+                    "type": "string",
+                    "maxLength": 50,
+                    "description": "Discount code (magic words for cheaper rates)",
+                    "example": "EARLY50"
+                  },
+                  "payment": {
+                    "type": "string",
+                    "maxLength": 100,
+                    "description": "Stripe payment intent ID (your wallet's contribution to the cause)",
+                    "example": "pm_1234567890abcdef"
+                  }
                 }
               }
             }
           }
+        },
+        "responses": {
+          "201": {
+            "description": "Welcome aboard! Your card has been charged.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "access_token": {
+                      "type": "string",
+                      "description": "Your shiny new JWT token for API access",
+                      "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                    },
+                    "ws_token": {
+                      "type": "string",
+                      "description": "Your shiny new JWT token for Websocket access",
+                      "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                    },
+                    "token_type": {
+                      "type": "string",
+                      "description": "Always 'bearer' (like a burden you must carry)",
+                      "example": "bearer"
+                    },
+                    "expires_in": {
+                      "type": "integer",
+                      "description": "Token lifespan in seconds (tick tock)",
+                      "example": 7200
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "409": {
+            "$ref": "#/components/responses/EmailTaken"
+          },
+          "412": {
+            "$ref": "#/components/responses/PaymentDeclined"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          },
+          "429": {
+            "$ref": "#/components/responses/SlowDown"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerExistentialCrisis"
+          },
+          "502": {
+            "$ref": "#/components/responses/UpstreamProblems"
+          },
+          "503": {
+            "$ref": "#/components/responses/TemporarilyUnavailable"
+          },
+          "504": {
+            "$ref": "#/components/responses/TookTooLong"
+          }
         }
       }
-    }
-  },
-  "webhooks": {
-    "/plant/webhook": {
+    },
+    "/token": {
       "post": {
-        "description": "Information about a new plant added to the store",
+        "tags": [
+          "Members"
+        ],
+        "summary": "Get your access pass",
+        "description": "## Login and Authentication\n\nExchange your email and password for a JWT token. It's like a backstage pass but for APIs.\n\n**Security features:**\n- Rate limiting prevents brute force (10 attempts then timeout)\n- Case-insensitive emails (we're reasonable people)\n- Tokens expire after 1 week (nothing good lasts forever)\n\n**Token usage:**\n- Include in Authorization header: `Bearer <token>`\n- Refresh before expiry or start the login dance again\n",
         "requestBody": {
-          "description": "Plant added to the store",
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/NewPlant"
+                "type": "object",
+                "required": [
+                  "email",
+                  "password"
+                ],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "description": "Your registered email (the one you hopefully remember)",
+                    "example": "hiring@techcorp.com"
+                  },
+                  "password": {
+                    "type": "string",
+                    "description": "The random string we emailed (check spam folder)",
+                    "example": "abc123def456"
+                  }
+                }
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Return a 200 status to indicate that the data was received successfully"
+            "description": "Authentication successful. You're in!",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/WrongCredentials"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          },
+          "429": {
+            "$ref": "#/components/responses/SlowDown"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerExistentialCrisis"
+          }
+        }
+      }
+    },
+    "/forgot": {
+      "post": {
+        "tags": [
+          "Members"
+        ],
+        "summary": "Password amnesia recovery",
+        "description": "## Password Reset for the Forgetful\n\nLost your password? Join the club of developers who can remember every API endpoint but not their own credentials.\n\n**How it works:**\n- We generate a new random password (16 characters of pure chaos)\n- Email it to you (check spam folder, our emails are that good)\n- Always returns 204 regardless of email existence (security through confusion)\n",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "email"
+                ],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "description": "The email you think you used to sign up",
+                    "example": "hiring@techcorp.com"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Password reset email sent (maybe, we'll never tell)"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerExistentialCrisis"
+          }
+        }
+      }
+    },
+    "/refresh": {
+      "put": {
+        "tags": [
+          "Members"
+        ],
+        "summary": "Token life support",
+        "description": "## Extend Your Session\n\nGet a fresh JWT token before your current one expires and locks you out.\nTokens are like milk - they go bad if you don't refresh them.\n",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Fresh token delivered. Your session lives on.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/TokenDead"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerExistentialCrisis"
+          }
+        }
+      }
+    },
+    "/me": {
+      "get": {
+        "tags": [
+          "Clubhouse"
+        ],
+        "summary": "View current company profile",
+        "description": "## Company Profile and Statistics\n\nGet complete company details including aggregated usage statistics.\nPerfect for dashboard displays and account overview.\n\n**Statistics included:**\n- Total submissions across all candidates\n- Total charges processed for assessments\n- Total webhook deliveries attempted\n\n**Account status indicators:**\n- Payment status and setup date\n- Account pause status (if applicable)\n- Current configuration settings\n",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Company profile retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "description": "Company unique identifier",
+                      "example": "507f1f77bcf86cd799439011"
+                    },
+                    "name": {
+                      "type": "string",
+                      "description": "Company name",
+                      "example": "TechCorp Solutions"
+                    },
+                    "email": {
+                      "type": "string",
+                      "description": "Company email address",
+                      "example": "hiring@techcorp.com"
+                    },
+                    "live_code": {
+                      "type": "string",
+                      "description": "Live assessment code (charges $39 per completion)",
+                      "example": "1AB2CD3EF4"
+                    },
+                    "test_code": {
+                      "type": "string",
+                      "description": "Test code for development and webhook testing",
+                      "example": "T123456789"
+                    },
+                    "personalities": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "description": "Configured AI personalities for evaluation",
+                      "example": [
+                        "jaded_dev",
+                        "caffeinated_genius",
+                        "mad_scientist"
+                      ]
+                    },
+                    "webhook_url": {
+                      "type": "string",
+                      "description": "Webhook URL for result notifications",
+                      "example": "https://api.yourcompany.com/webhooks/error-golf"
+                    },
+                    "per_candidate": {
+                      "type": "integer",
+                      "description": "Maximum attempts allowed per candidate",
+                      "example": 2
+                    },
+                    "paid_at": {
+                      "type": "string",
+                      "format": "date-time",
+                      "nullable": true,
+                      "description": "When setup fee was paid",
+                      "example": "2025-07-03T01:01:50.474Z"
+                    },
+                    "discount_code": {
+                      "type": "string",
+                      "description": "Discount code used during signup",
+                      "example": "EARLY50"
+                    },
+                    "referral_code": {
+                      "type": "string",
+                      "description": "Referral code used during signup",
+                      "example": "DEV001"
+                    },
+                    "paused_at": {
+                      "type": "string",
+                      "format": "date-time",
+                      "description": "When account was paused (only present if paused)",
+                      "example": "2025-07-04T01:46:27.018Z"
+                    },
+                    "created_at": {
+                      "type": "string",
+                      "format": "date-time",
+                      "description": "Account creation timestamp",
+                      "example": "2025-07-03T01:01:50.474Z"
+                    },
+                    "updated_at": {
+                      "type": "string",
+                      "format": "date-time",
+                      "description": "Last account update timestamp",
+                      "example": "2025-07-04T01:46:27.018Z"
+                    },
+                    "stats": {
+                      "type": "object",
+                      "description": "Aggregated usage statistics",
+                      "properties": {
+                        "submissions": {
+                          "type": "integer",
+                          "description": "Total submissions received",
+                          "example": 47
+                        },
+                        "charges": {
+                          "type": "integer",
+                          "description": "Total charges processed",
+                          "example": 42
+                        },
+                        "webhooks": {
+                          "type": "integer",
+                          "description": "Total webhook deliveries attempted",
+                          "example": 41
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/TokenDead"
+          },
+          "404": {
+            "description": "Company not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "company_not_found",
+                  "message": "Company not found"
+                }
+              }
+            }
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerExistentialCrisis"
+          }
+        }
+      }
+    },
+    "/invite": {
+      "post": {
+        "tags": [
+          "Clubhouse"
+        ],
+        "summary": "Spam candidates with coding nightmares",
+        "description": "## Bulk Candidate Torture Invitations\n\nSend Error Golf challenge invitations to up to 100 unsuspecting candidates at once. Perfect for lazy hiring managers who can't be bothered to copy-paste email addresses like some kind of prehistoric recruiter.\n\n**The process:**\n1. Submit a list of email addresses (1-100 victims)\n2. We validate each email and remove duplicates (because even chaos needs order)\n3. Invitations are sent asynchronously in batches of 10 (so we don't anger the email gods)\n4. Each candidate gets your company's live code and a one-way ticket to developer purgatory\n\n**Rate limiting (because we're not completely evil):**\n- 1000 invitations per company per day\n- Limit resets at midnight UTC (when all good developers should be sleeping)\n- Current usage returned so you know when to stop the madness\n\n**Email validation (surprisingly thorough):**\n- Proper email format checking (we're not savages)\n- Automatic whitespace trimming (because spaces are the devil)\n- Duplicate removal (nobody deserves our questions twice in one day)\n- Helpful error messages for when you inevitably mess up\n\n**Async processing (the waiting game):**\n- Emails sent in background batches while you contemplate your hiring choices\n- Individual failures don't stop the chaos train\n- Small delays between batches (even email services have feelings)\n\n**Warning:** This uses your live code, so completed assessments will cost you $39 each. Budget accordingly.\n",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "emails"
+                ],
+                "properties": {
+                  "emails": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "email"
+                    },
+                    "minItems": 1,
+                    "maxItems": 100,
+                    "description": "List of email addresses for candidates brave enough to face the chaos",
+                    "example": [
+                      "sarah.chen@example.com",
+                      "unsuspecting.dev@techcorp.com",
+                      "future.victim@startup.io"
+                    ]
+                  }
+                }
+              },
+              "examples": {
+                "single_victim": {
+                  "summary": "Single candidate sacrifice",
+                  "value": {
+                    "emails": [
+                      "sarah.chen@example.com"
+                    ]
+                  }
+                },
+                "multiple_victims": {
+                  "summary": "Mass developer torment",
+                  "value": {
+                    "emails": [
+                      "sarah.chen@example.com",
+                      "alex.dev@techcorp.com",
+                      "candidate@startup.io",
+                      "developer@company.com"
+                    ]
+                  }
+                },
+                "enterprise_chaos": {
+                  "summary": "Corporate-scale suffering",
+                  "value": {
+                    "emails": [
+                      "candidate1@company.com",
+                      "candidate2@company.com",
+                      "candidate3@company.com"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Invitations accepted. The chaos begins.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Status message about your batch of digital torment",
+                      "example": "Invitations are being sent to 3 unsuspecting souls. Invalid emails were mercifully spared."
+                    },
+                    "sent": {
+                      "type": "integer",
+                      "description": "Number of valid emails receiving invitations to developer purgatory",
+                      "example": 3
+                    },
+                    "skipped": {
+                      "type": "integer",
+                      "description": "Number of invalid emails that escaped the chaos",
+                      "example": 1
+                    },
+                    "refused": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "description": "Invalid emails that were rejected (probably for the best)",
+                      "example": [
+                        "invalid-email@",
+                        "not.an.email"
+                      ]
+                    },
+                    "remaining": {
+                      "type": "integer",
+                      "description": "Remaining invitation slots before we cut you off for the day",
+                      "example": 997
+                    }
+                  }
+                },
+                "examples": {
+                  "perfect_execution": {
+                    "summary": "All emails valid (rare achievement)",
+                    "value": {
+                      "message": "Invitations are being sent to 3 unsuspecting souls.",
+                      "sent": 3,
+                      "skipped": 0,
+                      "remaining": 997
+                    }
+                  },
+                  "human_error": {
+                    "summary": "Some emails invalid (more realistic)",
+                    "value": {
+                      "message": "Invitations are being sent to 2 candidates. Invalid emails were mercifully spared.",
+                      "sent": 2,
+                      "skipped": 1,
+                      "refused": [
+                        "invalid@"
+                      ],
+                      "remaining": 998
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/TokenDead"
+          },
+          "403": {
+            "description": "Account temporarily unable to spread chaos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "service_unavailable",
+                  "message": "Service is currently unavailable for your account"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Your email list needs work",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "email_disaster": {
+                    "summary": "No valid emails survived validation",
+                    "value": {
+                      "error": "no_valid_emails",
+                      "message": "No valid email addresses provided. First error: Email 'invalid@' at position 2 has invalid format"
+                    }
+                  },
+                  "format_failure": {
+                    "summary": "Request format completely wrong",
+                    "value": {
+                      "error": "validation_error",
+                      "message": "Invalid request format. Expected JSON with 'emails' array (1-100 items)"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "You've hit your daily chaos quota",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "daily_invite_limit_exceeded",
+                  "message": "Daily invite limit exceeded. Used: 995, Available: 5, Requested: 10. Limit resets at midnight UTC."
+                }
+              }
+            }
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerExistentialCrisis"
+          }
+        }
+      }
+    },
+    "/round": {
+      "post": {
+        "tags": [
+          "Round"
+        ],
+        "summary": "Initialize candidate evaluation",
+        "description": "## Start a New Round\n\nBegin a fresh coding challenge for a candidate. Like starting a new game, but with more existential dread.\n\n**The process:**\n1. Validate company code (live codes cost money, test codes are free)\n2. Check candidate attempt limits (prevent infinite retries)\n3. Verify selected questions actually exist\n4. Generate random question data for fairness\n5. Create draft submission record\n6. Return questions and submission token\n\n**Company codes:**\n- **Live Code:** Charges $39 on completion, starts with 0-9\n- **Test Code:** Free practice rounds, starts with 'T'\n\n**Limits:**\n- Per-candidate attempt limits are configurable\n- Test codes have daily usage quotas\n",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "email",
+                  "code",
+                  "choices"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "Candidate's name (for the hall of fame/shame)",
+                    "example": "Sarah Chen"
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "description": "Candidate's email (for results and condolences)",
+                    "example": "sarah.chen@example.com"
+                  },
+                  "code": {
+                    "type": "string",
+                    "minLength": 10,
+                    "maxLength": 10,
+                    "description": "Company challenge code (your ticket to the show)",
+                    "pattern": "^[A-Z0-9]{10}$",
+                    "example": "HC7K9M2X8L"
+                  },
+                  "choices": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 100
+                    },
+                    "minItems": 3,
+                    "maxItems": 3,
+                    "description": "3 question IDs from the vault of coding horrors",
+                    "example": [
+                      1,
+                      42,
+                      78
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Found existing incomplete session. Resume where you left off."
+          },
+          "201": {
+            "description": "Challenge initialized. Questions loaded and ready.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "jwt": {
+                      "type": "string",
+                      "description": "Submission token (valid for 72 hours of procrastination)",
+                      "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                    },
+                    "round": {
+                      "type": "object",
+                      "properties": {
+                        "round_id": {
+                          "type": "string",
+                          "description": "Unique challenge session identifier",
+                          "example": "6865da013b9c84ef622a4f2f"
+                        },
+                        "holes": {
+                          "type": "object",
+                          "description": "The chosen instruments of evaluation",
+                          "example": {
+                            "1": {
+                              "id": 1,
+                              "title": "Midlife Crisis Sports Car Database",
+                              "category": "intermediate",
+                              "difficulty": 5,
+                              "description": "A car dealership system that targets men experiencing existential dread...",
+                              "human": {
+                                "input_format": "Corporate executive crisis with status anxiety",
+                                "output_format": "Professional image optimization with financial prudence",
+                                "examples": {
+                                  "input": "52-year-old engineer, separation, teenagers mock minivan",
+                                  "output": "Reliable Camaro, payment around alimony, emphasize practicality"
+                                }
+                              }
+                            },
+                            "42": {
+                              "id": 42,
+                              "title": "Academic Tenure Battle Algorithm",
+                              "category": "expert",
+                              "difficulty": 8
+                            },
+                            "78": {
+                              "id": 78,
+                              "title": "Dating App Algorithmic Optimization",
+                              "category": "intermediate",
+                              "difficulty": 6
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/InvalidCode"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          },
+          "429": {
+            "$ref": "#/components/responses/AttemptLimitReached"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerExistentialCrisis"
+          }
+        }
+      }
+    },
+    "/round/{id}": {
+      "put": {
+        "tags": [
+          "Round"
+        ],
+        "summary": "Submit answers for judgment",
+        "description": "## Final Answer Submission\n\nSubmit candidate solutions for evaluation. This is the point of no return.\n\n**What happens next:**\n1. Solutions are validated and stored\n2. Confirmation emails sent to candidate and company\n3. Analysis queued (3 personalities will judge each answer)\n4. If live code: $39 charge processed\n5. Results emailed when analysis completes\n6. Webhook notification sent (if configured)\n\n**Language options:**\n- Any string accepted: \"python\", \"brainfuck\", \"human\", \"interpretive_dance\", \"tears\"\n- Creativity in language choice is part of the scoring\n\n**Scoring dimensions:**\n- **Quality:** Code elegance and structure\n- **Creativity:** Unexpected approaches and novel solutions\n- **Ingenuity:** Problem-solving insights and clever shortcuts\n- **Humor:** Funny variables, amusing comments, witty structure\n- **Correctness:** Does it actually work or just look convincing?\n",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "description": "Submission ID from challenge initialization",
+            "example": "6865da013b9c84ef622a4f2f"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "questions"
+                ],
+                "properties": {
+                  "message": {
+                    "type": "string",
+                    "maxLength": 1000,
+                    "description": "Optional message to the hiring team",
+                    "example": "I hope you appreciate the artistic beauty of my variable names"
+                  },
+                  "shots": {
+                    "type": "object",
+                    "minProperties": 3,
+                    "maxProperties": 3,
+                    "description": "Solutions keyed by question ID",
+                    "example": {
+                      "1": {
+                        "language": "human",
+                        "answer": "Check hair loss + divorce status. Recommend therapy over Corvette for financial stability."
+                      },
+                      "42": {
+                        "language": "math",
+                        "answer": "P(tenure) = merit^2 / (politics * committee_size + friendship_casualties)"
+                      },
+                      "78": {
+                        "language": "javascript",
+                        "answer": "const solve = (desperation) => desperation > 0.8 ? 'emergency_intervention' : 'mild_concern';"
+                      }
+                    },
+                    "additionalProperties": {
+                      "type": "object",
+                      "required": [
+                        "language",
+                        "answer"
+                      ],
+                      "properties": {
+                        "language": {
+                          "type": "string",
+                          "description": "Solution approach or programming language",
+                          "example": "python"
+                        },
+                        "answer": {
+                          "type": "string",
+                          "description": "The candidate's attempt at solving the unsolvable",
+                          "example": "def midlife_crisis(age, hair_loss): return 'therapy' if age > 50 else 'sports_car'"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Solutions submitted. Analysis commencing."
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/TokenDead"
+          },
+          "404": {
+            "$ref": "#/components/responses/SubmissionNotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/AlreadySubmitted"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerExistentialCrisis"
+          }
+        }
+      }
+    },
+    "/playback": {
+      "get": {
+        "tags": [
+          "Clubhouse"
+        ],
+        "summary": "Browse your rounds hall of fame",
+        "description": "## View Submission History\n\nBrowse all submissions for your company. Like a trophy case, but for code reviews.\n\n**Filtering options:**\n- Search by candidate email or name\n- Sort by various timestamps\n- Paginate through the results\n\n**Submission states:**\n- `draft` - Started but not submitted (chickened out)\n- `submitted` - Committed to their fate\n- `processing` - Judges are deliberating\n- `analyzed` - Complete with scores and commentary\n\n**Submission types:**\n- `test: 1` - Practice round (free)\n- `test: 0` - Real evaluation ($39 charged)\n\n**Note:** All submissions include scorecards in the response for your convenience.\n",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1
+            },
+            "description": "Page number for pagination"
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 15
+            },
+            "description": "Results per page (max 100)"
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "created_at",
+                "submitted_at",
+                "processing_started_at",
+                "processing_finished_at",
+                "email",
+                "status"
+              ],
+              "default": "created_at"
+            },
+            "description": "Field to sort by"
+          },
+          {
+            "name": "dir",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "default": "desc"
+            },
+            "description": "Sort direction"
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Search term for candidate email or name"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Submission list retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "allOf": [
+                          {
+                            "$ref": "#/components/schemas/Submission"
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "scorecard": {
+                                "$ref": "#/components/schemas/Scorecard",
+                                "description": "Analysis results (always included)"
+                              }
+                            }
+                          }
+                        ]
+                      },
+                      "description": "Array of submission records with attached scorecards"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/PaginationMeta"
+                    },
+                    "links": {
+                      "$ref": "#/components/schemas/PaginationLinks"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/TokenDead"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerExistentialCrisis"
+          }
+        }
+      }
+    },
+    "/playback/{id}": {
+      "get": {
+        "tags": [
+          "Clubhouse"
+        ],
+        "summary": "Individual game deep dive",
+        "description": "## Individual Submission Details\n\nGet complete details for a specific submission, including analysis if available.\n\n**What you get:**\n- Full submission metadata and timeline\n- Complete question context via \"course\" key with variation-specific content\n- Candidate's solutions for all questions\n- Analysis scores and commentary (when complete)\n- Processing timestamps and current status\n- Email delivery confirmations\n- Everything needed for hiring decisions\n\n**Course data structure:**\n- Questions keyed by ID with complete context\n- Includes the specific variation content the candidate received\n- Variation letters (A-E) are never exposed for security\n- Provides full question details: description, examples, hints, edge cases\n\n**Scorecard structure:**\n- 3 personalities evaluate each solution\n- Scores range from 15-90 across 5 dimensions\n- Detailed commentary explaining the scoring\n- Overall summary with strengths and weaknesses\n",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "description": "Submission ID to retrieve",
+            "example": "6865d67ede0cf7e8fd94e4dd"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Submission details retrieved with complete question context",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/Submission"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "course": {
+                          "$ref": "#/components/schemas/CourseData"
+                        },
+                        "message": {
+                          "type": "string",
+                          "description": "Optional message from candidate to hiring team",
+                          "example": "Hi team, here are my solutions!"
+                        },
+                        "shots": {
+                          "type": "object",
+                          "description": "Candidate solutions keyed by question ID",
+                          "additionalProperties": {
+                            "type": "object",
+                            "properties": {
+                              "language": {
+                                "type": "string",
+                                "description": "Solution approach or programming language"
+                              },
+                              "code": {
+                                "type": "string",
+                                "description": "The candidate's solution code"
+                              }
+                            }
+                          },
+                          "example": {
+                            "1": {
+                              "language": "human",
+                              "code": "52-year-old engineer, separation, teenagers mock minivan. Recommendation: Reliable Camaro, payment around alimony, emphasize practicality."
+                            },
+                            "2": {
+                              "language": "math",
+                              "code": "m=15, v=50000000, r=0.9 → C=45%, V=$22500000, I=5%"
+                            }
+                          }
+                        },
+                        "scorecard": {
+                          "$ref": "#/components/schemas/Scorecard"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/TokenDead"
+          },
+          "404": {
+            "$ref": "#/components/responses/SubmissionNotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerExistentialCrisis"
+          }
+        }
+      }
+    },
+    "/settings": {
+      "get": {
+        "tags": [
+          "Clubhouse"
+        ],
+        "summary": "View current configuration",
+        "description": "## Current Settings Overview\n\nCheck your company's current configuration and preferences.\nPasswords are hidden because we're not completely insane.\n",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Current configuration retrieved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompanySettings"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/TokenDead"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerExistentialCrisis"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Clubhouse"
+        ],
+        "summary": "Update configuration",
+        "description": "## Modify Your Settings\n\nUpdate company configuration. Only include fields you want to change.\n\n**Security notifications:**\nSensitive changes trigger email alerts:\n- Email changes: notification sent to the old email address\n- Password changes: confirmation to current email\n- Live code changes: notification with old and new codes\n- Webhook changes: notification about new configuration\n\n**Personality options:**\nChoose from 20+ personalities for scoring variety:\n- `jaded_dev` - Cynical veteran who's seen every horror\n- `caffeinated_genius` - 3am energy, connects everything to quantum mechanics\n- `academic_rebel` - PhD dropout with street smarts\n- `mad_scientist` - Chaos enthusiast who believes systems need more entropy\n- Plus many more for maximum evaluation diversity\n\n**Validation requirements:**\n- Live codes: unique, 10+ characters, must start with digit\n- Emails: unique and properly formatted\n- Passwords: 10+ characters with confirmation\n- Webhook URLs: valid HTTPS endpoints only\n- Candidate limits: 1-4 attempts per email address\n",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "live_code": {
+                    "type": "string",
+                    "minLength": 10,
+                    "pattern": "^[0-9][A-Z0-9]+$",
+                    "description": "New live code (must start with digit and be unique)",
+                    "example": "1AB2CD3EF4"
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "description": "New email address (must be unique)",
+                    "example": "newemail@techcorp.com"
+                  },
+                  "password": {
+                    "type": "string",
+                    "minLength": 10,
+                    "description": "New password (requires confirmation)"
+                  },
+                  "password_confirmation": {
+                    "type": "string",
+                    "description": "Password confirmation (required if password provided)"
+                  },
+                  "webhook_url": {
+                    "type": "string",
+                    "format": "uri",
+                    "description": "Webhook URL for result notifications (empty string to disable)",
+                    "example": "https://api.yourcompany.com/webhooks/error-golf"
+                  },
+                  "webhook_secret": {
+                    "type": "string",
+                    "minLength": 10,
+                    "pattern": "^[A-Za-z0-9]+$",
+                    "description": "Secret for webhook signature verification",
+                    "example": "abc123def456ghi789"
+                  },
+                  "per_candidate": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 4,
+                    "description": "Maximum attempts per candidate email",
+                    "example": 2
+                  },
+                  "personality_first": {
+                    "type": "string",
+                    "description": "First evaluator personality",
+                    "example": "jaded_dev"
+                  },
+                  "personality_second": {
+                    "type": "string",
+                    "description": "Second evaluator personality",
+                    "example": "caffeinated_genius"
+                  },
+                  "personality_third": {
+                    "type": "string",
+                    "description": "Third evaluator personality",
+                    "example": "mad_scientist"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Settings updated successfully"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/TokenDead"
+          },
+          "409": {
+            "$ref": "#/components/responses/EmailTaken"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerExistentialCrisis"
+          }
+        }
+      }
+    },
+    "/cancel": {
+      "delete": {
+        "tags": [
+          "Clubhouse"
+        ],
+        "summary": "Account termination",
+        "description": "## Delete Your Account\n\nPermanently delete your company account and stop all billing.\n\n**What happens:**\n- Account becomes inaccessible\n- Billing stops immediately\n- Confirmation email sent\n- Current JWT tokens become invalid\n\n**Note:** This action is irreversible through the API. Contact support if you change your mind.\n",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Account successfully deleted"
+          },
+          "401": {
+            "$ref": "#/components/responses/TokenDead"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerExistentialCrisis"
+          }
+        }
+      }
+    },
+    "/pause": {
+      "post": {
+        "tags": [
+          "Clubhouse"
+        ],
+        "summary": "Pause new submissions",
+        "description": "## Temporary Service Pause\n\nTemporarily stop accepting new candidate submissions while keeping existing ones processing.\nPerfect for when you need a break from the beautiful chaos of hiring.\n\n**Effects:**\n- New submissions blocked with your company codes\n- Existing submissions continue processing normally\n- Email notification sent confirming the pause\n",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Service paused successfully"
+          },
+          "401": {
+            "$ref": "#/components/responses/TokenDead"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerExistentialCrisis"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Clubhouse"
+        ],
+        "summary": "Resume normal operations",
+        "description": "## Unpause Service\n\nResume accepting new candidate submissions after a pause.\n\n**Effects:**\n- New submissions accepted again\n- Normal operations restored\n- Email notification sent confirming resumption\n",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Service resumed successfully"
+          },
+          "401": {
+            "$ref": "#/components/responses/TokenDead"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerExistentialCrisis"
           }
         }
       }
     }
   },
   "components": {
-    "schemas": {
-      "Plant": {
-        "required": [
-          "name"
-        ],
-        "type": "object",
-        "properties": {
-          "name": {
-            "description": "The name of the plant",
-            "type": "string"
-          },
-          "tag": {
-            "description": "Tag to specify the type",
-            "type": "string"
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "JWT token from /token endpoint"
+      }
+    },
+    "responses": {
+      "BadRequest": {
+        "description": "Request was malformed or contained invalid data",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            },
+            "example": {
+              "error": "empty_request_body",
+              "message": "Request body cannot be empty. Please include some data."
+            }
           }
         }
       },
-      "NewPlant": {
+      "TokenDead": {
+        "description": "JWT token is invalid or has expired",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            },
+            "example": {
+              "error": "token_expired",
+              "message": "Your authentication token has expired. Please login again."
+            }
+          }
+        }
+      },
+      "ValidationError": {
+        "description": "Input validation failed",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            },
+            "examples": {
+              "missing_email": {
+                "value": {
+                  "error": "missing_required_field",
+                  "message": "Email field is required but was not provided."
+                }
+              },
+              "invalid_email": {
+                "value": {
+                  "error": "invalid_email_format",
+                  "message": "The provided email address format is invalid."
+                }
+              }
+            }
+          }
+        }
+      },
+      "EmailTaken": {
+        "description": "Email address is already registered",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            },
+            "example": {
+              "error": "email_already_exists",
+              "message": "An account with this email address already exists."
+            }
+          }
+        }
+      },
+      "WrongCredentials": {
+        "description": "Invalid email or password",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            },
+            "example": {
+              "error": "authentication_failed",
+              "message": "Email or password is incorrect. Try the forgot password option."
+            }
+          }
+        }
+      },
+      "InvalidCode": {
+        "description": "Company code is invalid or expired",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            },
+            "example": {
+              "error": "invalid_company_code",
+              "message": "The provided company code is invalid or has expired."
+            }
+          }
+        }
+      },
+      "AttemptLimitReached": {
+        "description": "Candidate has exceeded attempt limit",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            },
+            "examples": {
+              "per_candidate_limit": {
+                "value": {
+                  "error": "attempt_limit_exceeded",
+                  "message": "This candidate has reached the maximum number of attempts (3)."
+                }
+              },
+              "daily_test_limit": {
+                "value": {
+                  "error": "daily_test_limit_exceeded",
+                  "message": "Daily test submission limit has been reached."
+                }
+              }
+            }
+          }
+        }
+      },
+      "SubmissionNotFound": {
+        "description": "Submission not found or doesn't belong to your company",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            },
+            "example": {
+              "error": "submission_not_found",
+              "message": "The requested submission could not be found."
+            }
+          }
+        }
+      },
+      "AlreadySubmitted": {
+        "description": "Submission has already been completed",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            },
+            "example": {
+              "error": "submission_already_completed",
+              "message": "This submission has already been finalized and cannot be modified."
+            }
+          }
+        }
+      },
+      "PaymentDeclined": {
+        "description": "Payment processing failed",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            },
+            "example": {
+              "error": "payment_processing_failed",
+              "message": "Your payment method was declined. Please check your card details."
+            }
+          }
+        }
+      },
+      "PreconditionFailed": {
+        "description": "Required preconditions were not met",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            },
+            "example": {
+              "error": "precondition_not_met",
+              "message": "Required conditions for this operation were not satisfied."
+            }
+          }
+        }
+      },
+      "SlowDown": {
+        "description": "Rate limit exceeded",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            },
+            "example": {
+              "error": "rate_limit_exceeded",
+              "message": "Too many requests. Please wait before trying again."
+            }
+          }
+        }
+      },
+      "ServerExistentialCrisis": {
+        "description": "Internal server error",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            },
+            "example": {
+              "error": "internal_server_error",
+              "message": "Something went wrong on our end. We're looking into it."
+            }
+          }
+        }
+      },
+      "UpstreamProblems": {
+        "description": "Bad gateway error",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            },
+            "example": {
+              "error": "upstream_service_error",
+              "message": "One of our upstream services is having issues."
+            }
+          }
+        }
+      },
+      "TemporarilyUnavailable": {
+        "description": "Service temporarily unavailable",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            },
+            "example": {
+              "error": "service_temporarily_unavailable",
+              "message": "Service is temporarily unavailable. Please try again later."
+            }
+          }
+        }
+      },
+      "TookTooLong": {
+        "description": "Gateway timeout",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            },
+            "example": {
+              "error": "request_timeout",
+              "message": "The request took too long to process."
+            }
+          }
+        }
+      }
+    },
+    "schemas": {
+      "ErrorResponse": {
+        "type": "object",
+        "required": [
+          "error",
+          "message"
+        ],
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Machine-readable error identifier"
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable error explanation"
+          }
+        }
+      },
+      "TokenResponse": {
+        "type": "object",
+        "description": "Authentication token response",
+        "properties": {
+          "access_token": {
+            "type": "string",
+            "description": "JWT bearer token for API authentication",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjb21wYW55X2lkIjoiNjg1ZjViZGU5MjhkN2FhZDMyOWZhYmQ2IiwiZW1haWwiOiJhY0B0ZXN0LmNvbSIsImV4cCI6MTc1MTc2NDYwOSwiaWF0IjoxNzUxNTA1NDA5fQ.m5xD1XYrQL9uFSJz9A3DRwXIXsEcTojTyAbiNHajHck"
+          },
+          "ws_token": {
+            "type": "string",
+            "description": "JWT bearer token for Websocket authentication",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjb21wYW55X2lkIjoiNjg1ZjViZGU5MjhkN2FhZDMyOWZhYmQ2IiwiZW1haWwiOiJhY0B0ZXN0LmNvbSIsImV4cCI6MTc1MTc2NDYwOSwiaWF0IjoxNzUxNTA1NDA5fQ.m5xD1XYrQL9uFSJz9A3DRwXIXsEcTojTyAbiNHajHck"
+          },
+          "token_type": {
+            "type": "string",
+            "description": "Token type (always 'bearer' because that's how JWT rolls)",
+            "example": "bearer"
+          },
+          "expires_in": {
+            "type": "integer",
+            "description": "Token validity period in seconds (countdown to re-authentication)",
+            "example": 604800
+          }
+        }
+      },
+      "QuestionPublic": {
+        "type": "object",
+        "description": "Public question format (variation A content only)",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "description": "Question identifier from the vault",
+            "example": 1
+          },
+          "title": {
+            "type": "string",
+            "description": "Question title (usually involving developer trauma)",
+            "example": "Midlife Crisis Sports Car Database"
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "beginner",
+              "intermediate",
+              "expert"
+            ],
+            "description": "Difficulty category classification",
+            "example": "intermediate"
+          },
+          "difficulty": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10,
+            "description": "Pain level rating (1=mild annoyance, 10=existential crisis)",
+            "example": 5
+          },
+          "description": {
+            "type": "string",
+            "description": "Dark humor backstory explaining the coding scenario",
+            "example": "A car dealership system specifically targets men experiencing existential dread..."
+          },
+          "explanation": {
+            "type": "string",
+            "description": "Technical explanation of what's actually being tested",
+            "example": "This is a recommendation algorithm with moral guardrails..."
+          },
+          "example_solution": {
+            "$ref": "#/components/schemas/ExampleSolution"
+          },
+          "pass_conditions": {
+            "$ref": "#/components/schemas/PassConditions"
+          },
+          "failure_conditions": {
+            "$ref": "#/components/schemas/FailureConditions"
+          },
+          "human": {
+            "$ref": "#/components/schemas/VariationContent",
+            "description": "Natural language format requirements (variation A)"
+          },
+          "math": {
+            "$ref": "#/components/schemas/VariationContent",
+            "description": "Mathematical notation format (variation A)"
+          },
+          "chem": {
+            "$ref": "#/components/schemas/VariationContent",
+            "description": "Chemistry notation format (variation A)"
+          },
+          "physics": {
+            "$ref": "#/components/schemas/VariationContent",
+            "description": "Physics concepts format (variation A)"
+          },
+          "programming": {
+            "$ref": "#/components/schemas/VariationContent",
+            "description": "Programming language format (variation A)"
+          },
+          "hints": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Helpful clues for solving the problem (variation A)",
+            "example": [
+              "Hair loss + divorce = convertible preference (it's science)",
+              "Leather pants purchase = code red intervention needed"
+            ]
+          },
+          "edge_cases": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Tricky scenarios to consider (variation A)",
+            "example": [
+              "Customer already owns Corvette but wants another (addiction protocol)",
+              "Wife approves the purchase (suspicious, investigate further)"
+            ]
+          }
+        }
+      },
+      "ExampleSolution": {
+        "type": "object",
+        "description": "Sample solutions in different approaches",
+        "properties": {
+          "human": {
+            "$ref": "#/components/schemas/SolutionExample"
+          },
+          "math": {
+            "$ref": "#/components/schemas/SolutionExample"
+          },
+          "chem": {
+            "$ref": "#/components/schemas/SolutionExample"
+          },
+          "physics": {
+            "$ref": "#/components/schemas/SolutionExample"
+          },
+          "programming": {
+            "$ref": "#/components/schemas/ProgrammingExample"
+          }
+        }
+      },
+      "SolutionExample": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "example": "Balding + divorce = Corvette. Hair plugs + yoga = BMW."
+          }
+        }
+      },
+      "ProgrammingExample": {
+        "type": "object",
+        "properties": {
+          "language": {
+            "type": "string",
+            "example": "F#"
+          },
+          "code": {
+            "type": "string",
+            "example": "let rec(h,d,t)=match h,d with|High,true->Corvette|Med,false->Sedan|_->Therapy"
+          }
+        }
+      },
+      "PassConditions": {
+        "type": "object",
+        "properties": {
+          "minimum": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "Recommends appropriate vehicles based on desperation levels",
+              "Prevents financial suicide (retirement fund protection)"
+            ]
+          }
+        }
+      },
+      "FailureConditions": {
+        "type": "object",
+        "properties": {
+          "automatic": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "Recommends Lamborghini to guy making $40k",
+              "Ignores wife's veto power completely"
+            ]
+          }
+        }
+      },
+      "VariationContent": {
+        "type": "object",
+        "description": "Format-specific requirements and examples",
+        "properties": {
+          "input_format": {
+            "type": "string",
+            "description": "Expected input structure",
+            "example": "Customer crisis indicators and financial constraints"
+          },
+          "output_format": {
+            "type": "string",
+            "description": "Expected output structure",
+            "example": "Vehicle recommendation with ethical boundaries"
+          },
+          "examples": {
+            "$ref": "#/components/schemas/FormatExample"
+          }
+        }
+      },
+      "FormatExample": {
+        "type": "object",
+        "description": "Input/output example for this format",
+        "properties": {
+          "input": {
+            "type": "string",
+            "example": "47-year-old, advanced hair loss, recent divorce, liquidated 401k"
+          },
+          "output": {
+            "type": "string",
+            "example": "Certified Corvette, preserve some retirement, no flame decals"
+          },
+          "explanation": {
+            "type": "string",
+            "description": "Optional explanation of the example"
+          }
+        }
+      },
+      "QuestionDetails": {
+        "type": "object",
+        "description": "Complete question information with all formats",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Question identifier"
+          },
+          "title": {
+            "type": "string",
+            "description": "Question title (usually involving some form of developer trauma)"
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "beginner",
+              "intermediate",
+              "expert"
+            ]
+          },
+          "difficulty": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10
+          },
+          "description": {
+            "type": "string",
+            "description": "Backstory explaining the coding scenario"
+          },
+          "explanation": {
+            "type": "string",
+            "description": "Technical explanation of what's being tested"
+          },
+          "example_solution": {
+            "type": "object",
+            "description": "Sample solutions in different approaches"
+          },
+          "pass_conditions": {
+            "type": "object",
+            "description": "Minimum requirements for a passing solution"
+          },
+          "failure_conditions": {
+            "type": "object",
+            "description": "Conditions that result in automatic failure"
+          },
+          "human": {
+            "type": "object",
+            "description": "Natural language format requirements",
+            "properties": {
+              "input_format": {
+                "type": "string"
+              },
+              "output_format": {
+                "type": "string"
+              },
+              "examples": {
+                "type": "object"
+              }
+            }
+          },
+          "math": {
+            "type": "object",
+            "description": "Mathematical notation format requirements"
+          },
+          "chem": {
+            "type": "object",
+            "description": "Chemistry notation format requirements"
+          },
+          "physics": {
+            "type": "object",
+            "description": "Physics concepts format requirements"
+          },
+          "programming": {
+            "type": "object",
+            "description": "Programming language format requirements"
+          },
+          "hints": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Helpful clues for solving the problem"
+          },
+          "edge_cases": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Tricky scenarios to consider"
+          }
+        }
+      },
+      "Submission": {
+        "type": "object",
+        "description": "Basic submission record",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique submission identifier",
+            "example": "6865d67ede0cf7e8fd94e4dd"
+          },
+          "sheet_id": {
+            "type": "integer",
+            "description": "Question sheet version used",
+            "example": 1750822302
+          },
+          "email": {
+            "type": "string",
+            "description": "Candidate email address",
+            "example": "ac@test.com"
+          },
+          "name": {
+            "type": "string",
+            "description": "Candidate name",
+            "example": "Alex"
+          },
+          "holes": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "description": "Question IDs selected for this round",
+            "example": [
+              1,
+              2,
+              3
+            ]
+          },
+          "attempt": {
+            "type": "integer",
+            "description": "Attempt number for this candidate",
+            "example": 1
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "submitted",
+              "processing",
+              "analyzed"
+            ],
+            "description": "Current submission state"
+          },
+          "test": {
+            "type": "integer",
+            "enum": [
+              0,
+              1
+            ],
+            "description": "Test flag (0=live/charged, 1=test/free)"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2025-07-03T01:01:50.474Z"
+          },
+          "submitted_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "example": "2025-07-03T01:18:49.446Z"
+          },
+          "processing_started_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "example": "2025-07-04T01:46:09.137Z"
+          },
+          "processing_finished_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "example": "2025-07-04T01:46:27.018Z"
+          },
+          "candidate_emailed_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "When results were emailed to candidate",
+            "example": "2025-07-04T01:46:28.087Z"
+          },
+          "company_emailed_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "When results were emailed to company",
+            "example": "2025-07-04T01:46:28.076Z"
+          },
+          "webhook_completed_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "When webhook was successfully delivered",
+            "example": "2025-07-04T01:46:30.123Z"
+          }
+        }
+      },
+      "SubmissionDetail": {
         "allOf": [
           {
-            "$ref": "#/components/schemas/Plant"
+            "$ref": "#/components/schemas/Submission"
           },
           {
-            "required": [
-              "id"
-            ],
             "type": "object",
             "properties": {
-              "id": {
-                "description": "Identification number of the plant",
-                "type": "integer",
-                "format": "int64"
+              "message": {
+                "type": "string",
+                "description": "Optional message from candidate to hiring team",
+                "example": "Hi guys here is my submission!"
+              },
+              "shots": {
+                "type": "object",
+                "description": "Candidate solutions keyed by question ID",
+                "example": {
+                  "1": {
+                    "language": "human",
+                    "code": "52-year-old engineer, separation, teenagers mock minivan. Recommendation: Reliable Camaro, payment around alimony, emphasize practicality."
+                  },
+                  "2": {
+                    "language": "math",
+                    "code": "c=12, m=9.5, p=0.6 → T=30%, F=8, I=40%. Academic politics toxicity reduces tenure probability despite excellent research merit."
+                  },
+                  "3": {
+                    "language": "javascript",
+                    "code": "function icu_crisis(emergency, family_pressure, system_capacity) { return emergency > 8 ? {medical: 0.95, family: 0.05, save_rate: 90} : {medical: 0.7, family: 0.3, save_rate: 70}; }"
+                  }
+                },
+                "additionalProperties": {
+                  "type": "object",
+                  "properties": {
+                    "language": {
+                      "type": "string",
+                      "description": "Solution approach or programming language"
+                    },
+                    "code": {
+                      "type": "string",
+                      "description": "The candidate's solution code"
+                    }
+                  }
+                }
+              },
+              "scorecard": {
+                "$ref": "#/components/schemas/Scorecard"
               }
             }
           }
         ]
       },
-      "Error": {
-        "required": [
-          "error",
-          "message"
-        ],
+      "Scorecard": {
         "type": "object",
+        "description": "Analysis results for all questions",
         "properties": {
-          "error": {
+          "sheet_id": {
             "type": "integer",
-            "format": "int32"
+            "description": "Question sheet identifier",
+            "example": 1750822302
           },
-          "message": {
-            "type": "string"
+          "holes": {
+            "type": "object",
+            "description": "Evaluation results keyed by question ID",
+            "example": {
+              "1": {
+                "first": {
+                  "personality": "jaded_dev",
+                  "quality": {
+                    "score": 70,
+                    "commentary": "The recommendation is practical, but prioritizes short-term status boosts over long-term financial security."
+                  },
+                  "length": {
+                    "score": 75,
+                    "commentary": "Solution length: 222 characters"
+                  },
+                  "creativity": {
+                    "score": 60,
+                    "commentary": "The use of 'separation' and 'teenagers mock minivan' as input variables is clever, but the output is surprisingly straightforward."
+                  },
+                  "ingenuity": {
+                    "score": 75,
+                    "commentary": "The payment plan structured around alimony is a nice touch, demonstrating an understanding of the customer's financial constraints."
+                  },
+                  "humor": {
+                    "score": 50,
+                    "commentary": "The deadpan delivery is appreciated, but the solution lacks real bite or irony."
+                  },
+                  "correctness": {
+                    "score": 85,
+                    "commentary": "The recommendation is logically coherent and financially responsible."
+                  },
+                  "feedback": "This solution is a decent starting point, but lacks the clever psychological manipulation required to truly succeed in this space."
+                },
+                "second": {
+                  "personality": "jaded_dev",
+                  "quality": {
+                    "score": 80,
+                    "commentary": "Practical wisdom shines through in the recommendation of a reliable Camaro."
+                  }
+                },
+                "third": {
+                  "personality": "jaded_dev",
+                  "quality": {
+                    "score": 70,
+                    "commentary": "We appreciate the concise, human-centered approach."
+                  }
+                }
+              }
+            },
+            "additionalProperties": {
+              "type": "object",
+              "description": "Scores from multiple personalities (hah!)",
+              "properties": {
+                "first": {
+                  "$ref": "#/components/schemas/HoleScore"
+                },
+                "second": {
+                  "$ref": "#/components/schemas/HoleScore"
+                },
+                "third": {
+                  "$ref": "#/components/schemas/HoleScore"
+                }
+              }
+            }
+          },
+          "summary": {
+            "type": "string",
+            "description": "Overall evaluation summary",
+            "example": "Analyzed 3 questions with 3 jaded reviewers. Overall: 447/90. Strongest: Correctness (81). Weakest: Humor (66). The code has survived the gauntlet."
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2025-07-04T01:46:09.137Z"
+          }
+        }
+      },
+      "CourseData": {
+        "type": "object",
+        "description": "Question data keyed by question ID with variation-specific content",
+        "additionalProperties": {
+          "$ref": "#/components/schemas/CourseQuestion"
+        },
+        "example": {
+          "1": {
+            "id": 1,
+            "title": "Midlife Crisis Sports Car Database",
+            "category": "intermediate",
+            "difficulty": 5,
+            "description": "A car dealership system specifically targets men experiencing existential dread...",
+            "human": {
+              "input_format": "Corporate executive crisis with status anxiety",
+              "output_format": "Professional image optimization with financial prudence",
+              "examples": {
+                "input": "52-year-old engineer, separation, teenagers mock minivan",
+                "output": "Reliable Camaro, payment around alimony, emphasize practicality"
+              }
+            },
+            "hints": [
+              "Engineers think they're too logical for status symbols (they're wrong)",
+              "Lease payments should never exceed therapy costs"
+            ]
+          },
+          "2": {
+            "id": 2,
+            "title": "Viking Raid Optimization Algorithm",
+            "category": "intermediate",
+            "difficulty": 6
+          }
+        }
+      },
+      "CourseQuestion": {
+        "type": "object",
+        "description": "Individual question with variation-specific content",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Question identifier",
+            "example": 1
+          },
+          "title": {
+            "type": "string",
+            "description": "Question title",
+            "example": "Midlife Crisis Sports Car Database"
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "beginner",
+              "intermediate",
+              "expert"
+            ],
+            "description": "Difficulty category",
+            "example": "intermediate"
+          },
+          "difficulty": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10,
+            "description": "Pain level rating",
+            "example": 5
+          },
+          "description": {
+            "type": "string",
+            "description": "Dark humor backstory explaining the coding scenario",
+            "example": "A car dealership system specifically targets men experiencing existential dread..."
+          },
+          "explanation": {
+            "type": "string",
+            "description": "Technical explanation of what's being tested",
+            "example": "This is a recommendation algorithm with moral guardrails..."
+          },
+          "example_solution": {
+            "$ref": "#/components/schemas/ExampleSolution"
+          },
+          "pass_conditions": {
+            "$ref": "#/components/schemas/PassConditions"
+          },
+          "failure_conditions": {
+            "$ref": "#/components/schemas/FailureConditions"
+          },
+          "human": {
+            "$ref": "#/components/schemas/VariationContent",
+            "description": "Natural language format (specific variation content)"
+          },
+          "math": {
+            "$ref": "#/components/schemas/VariationContent",
+            "description": "Mathematical notation format (specific variation content)"
+          },
+          "chem": {
+            "$ref": "#/components/schemas/VariationContent",
+            "description": "Chemistry notation format (specific variation content)"
+          },
+          "physics": {
+            "$ref": "#/components/schemas/VariationContent",
+            "description": "Physics concepts format (specific variation content)"
+          },
+          "programming": {
+            "$ref": "#/components/schemas/VariationContent",
+            "description": "Programming language format (specific variation content)"
+          },
+          "hints": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Helpful clues for solving the problem (from specific variation)",
+            "example": [
+              "Engineers think they're too logical for status symbols (they're wrong)",
+              "Lease payments should never exceed therapy costs"
+            ]
+          },
+          "edge_cases": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Tricky scenarios to consider (from specific variation)",
+            "example": [
+              "Executive drives Tesla (already peak engineer ego, system overflow)",
+              "Family approval goes positive (check for bribery or Stockholm syndrome)"
+            ]
+          }
+        }
+      },
+      "HoleScore": {
+        "type": "object",
+        "description": "Individual personality evaluation for one question",
+        "properties": {
+          "personality": {
+            "type": "string",
+            "description": "Personality that performed this evaluation",
+            "example": "jaded_dev"
+          },
+          "quality": {
+            "type": "object",
+            "description": "Code quality evaluation",
+            "properties": {
+              "score": {
+                "type": "integer",
+                "minimum": 15,
+                "maximum": 90,
+                "example": 70
+              },
+              "commentary": {
+                "type": "string",
+                "example": "The solution shows good understanding but lacks depth."
+              }
+            }
+          },
+          "length": {
+            "type": "object",
+            "description": "Solution length evaluation",
+            "properties": {
+              "score": {
+                "type": "integer",
+                "minimum": 15,
+                "maximum": 90,
+                "example": 75
+              },
+              "commentary": {
+                "type": "string",
+                "example": "Solution length: 222 characters"
+              }
+            }
+          },
+          "creativity": {
+            "type": "object",
+            "description": "Creative approach evaluation",
+            "properties": {
+              "score": {
+                "type": "integer",
+                "minimum": 15,
+                "maximum": 90,
+                "example": 60
+              },
+              "commentary": {
+                "type": "string",
+                "example": "Shows some creative thinking but could be more innovative."
+              }
+            }
+          },
+          "ingenuity": {
+            "type": "object",
+            "description": "Problem-solving ingenuity evaluation",
+            "properties": {
+              "score": {
+                "type": "integer",
+                "minimum": 15,
+                "maximum": 90,
+                "example": 75
+              },
+              "commentary": {
+                "type": "string",
+                "example": "Demonstrates good problem-solving approach."
+              }
+            }
+          },
+          "humor": {
+            "type": "object",
+            "description": "Humor and wit evaluation",
+            "properties": {
+              "score": {
+                "type": "integer",
+                "minimum": 15,
+                "maximum": 90,
+                "example": 50
+              },
+              "commentary": {
+                "type": "string",
+                "example": "Some dry humor present but could be more entertaining."
+              }
+            }
+          },
+          "correctness": {
+            "type": "object",
+            "description": "Technical correctness evaluation",
+            "properties": {
+              "score": {
+                "type": "integer",
+                "minimum": 15,
+                "maximum": 90,
+                "example": 85
+              },
+              "commentary": {
+                "type": "string",
+                "example": "Solution is technically sound and logically coherent."
+              }
+            }
+          },
+          "feedback": {
+            "type": "string",
+            "description": "Overall detailed feedback for this question",
+            "example": "This solution shows promise but needs more creative flair and psychological insight."
+          }
+        }
+      },
+      "CompanySettings": {
+        "type": "object",
+        "description": "Company configuration and preferences",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Company name",
+            "example": "TechCorp Solutions"
+          },
+          "email": {
+            "type": "string",
+            "description": "Company email address",
+            "example": "hiring@techcorp.com"
+          },
+          "live_code": {
+            "type": "string",
+            "description": "Live evaluation code (charges $39 per completion)",
+            "example": "1AB2CD3EF4"
+          },
+          "test_code": {
+            "type": "string",
+            "description": "Test code for webhook testing and development",
+            "example": "T123456789"
+          },
+          "personalities": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 3,
+            "maxItems": 3,
+            "description": "Personalities for evaluation (first, second, third)",
+            "example": [
+              "jaded_dev",
+              "caffeinated_genius",
+              "mad_scientist"
+            ]
+          },
+          "webhook_url": {
+            "type": "string",
+            "nullable": true,
+            "description": "Webhook URL for result notifications",
+            "example": "https://api.yourcompany.com/webhooks/error-golf"
+          },
+          "webhook_secret": {
+            "type": "string",
+            "nullable": true,
+            "description": "Secret for webhook signature verification",
+            "example": "abc123def456ghi789"
+          },
+          "per_candidate": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 4,
+            "description": "Maximum attempts allowed per candidate",
+            "example": 2
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2025-07-03T01:01:50.474Z"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2025-07-04T01:46:27.018Z"
+          }
+        }
+      },
+      "PaginationMeta": {
+        "type": "object",
+        "description": "Pagination metadata",
+        "properties": {
+          "page": {
+            "type": "object",
+            "properties": {
+              "current-page": {
+                "type": "integer",
+                "description": "Current page number",
+                "example": 2
+              },
+              "per-page": {
+                "type": "integer",
+                "description": "Items per page",
+                "example": 15
+              },
+              "from": {
+                "type": "integer",
+                "description": "First item number on current page",
+                "example": 16
+              },
+              "to": {
+                "type": "integer",
+                "description": "Last item number on current page",
+                "example": 30
+              },
+              "total": {
+                "type": "integer",
+                "description": "Total number of items",
+                "example": 50
+              },
+              "last-page": {
+                "type": "integer",
+                "description": "Total number of pages",
+                "example": 4
+              }
+            }
+          }
+        }
+      },
+      "PaginationLinks": {
+        "type": "object",
+        "description": "Pagination navigation links",
+        "properties": {
+          "first": {
+            "type": "string",
+            "description": "URL for first page",
+            "example": "https://api.errorgolf.com/submissions?page=1&per_page=15"
+          },
+          "prev": {
+            "type": "string",
+            "nullable": true,
+            "description": "URL for previous page (null if on first page)",
+            "example": "https://api.errorgolf.com/submissions?page=1&per_page=15"
+          },
+          "next": {
+            "type": "string",
+            "nullable": true,
+            "description": "URL for next page (null if on last page)",
+            "example": "https://api.errorgolf.com/submissions?page=3&per_page=15"
+          },
+          "last": {
+            "type": "string",
+            "description": "URL for last page",
+            "example": "https://api.errorgolf.com/submissions?page=4&per_page=15"
+          }
+        }
+      },
+      "WebhookPayload": {
+        "type": "object",
+        "description": "Webhook payload sent when evaluation completes",
+        "properties": {
+          "event": {
+            "type": "string",
+            "enum": [
+              "submission.completed"
+            ],
+            "description": "Event type identifier"
+          },
+          "round_id": {
+            "type": "string",
+            "description": "Completed submission identifier",
+            "example": "6865d67ede0cf7e8fd94e4dd"
+          },
+          "company_id": {
+            "type": "string",
+            "description": "Company identifier",
+            "example": "685f5bde928d7aad329fabd6"
+          },
+          "candidate_email": {
+            "type": "string",
+            "description": "Candidate email address",
+            "example": "ac@test.com"
+          },
+          "candidate_name": {
+            "type": "string",
+            "description": "Candidate name",
+            "example": "Alex"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When evaluation completed",
+            "example": "2025-07-04T01:46:27.018Z"
+          },
+          "questions": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "description": "Question IDs that were answered",
+            "example": [
+              1,
+              2,
+              3
+            ]
+          },
+          "status": {
+            "type": "string",
+            "description": "Final submission status",
+            "example": "analyzed"
+          },
+          "summary": {
+            "type": "string",
+            "description": "AI-generated evaluation summary",
+            "example": "Analyzed 3 questions with 3 jaded reviewers. Overall: 447/90."
+          },
+          "scores": {
+            "type": "object",
+            "description": "Aggregated scores across all questions",
+            "properties": {
+              "overall": {
+                "type": "number",
+                "description": "Overall average score",
+                "example": 74.6
+              },
+              "quality": {
+                "type": "number",
+                "description": "Average quality score",
+                "example": 73.3
+              },
+              "creativity": {
+                "type": "number",
+                "description": "Average creativity score",
+                "example": 71.7
+              },
+              "ingenuity": {
+                "type": "number",
+                "description": "Average ingenuity score",
+                "example": 78.3
+              },
+              "humor": {
+                "type": "number",
+                "description": "Average humor score",
+                "example": 58.3
+              },
+              "correctness": {
+                "type": "number",
+                "description": "Average correctness score",
+                "example": 83.3
+              }
+            }
           }
         }
       }
+    }
+  },
+  "x-tagGroups": [
+    {
+      "name": "Core API",
+      "tags": [
+        "Health",
+        "Authentication"
+      ]
     },
-    "securitySchemes": {
-      "bearerAuth": {
-        "type": "http",
-        "scheme": "bearer"
+    {
+      "name": "Company Operations",
+      "tags": [
+        "Company Management",
+        "Submissions"
+      ]
+    }
+  ],
+  "x-webhooks": {
+    "submission_completed": {
+      "post": {
+        "summary": "Evaluation Complete Webhook",
+        "description": "## Webhook: Evaluation Analysis Complete\n\nSent when evaluation finishes and results are available.\n\n**When this fires:**\n- Analysis completes successfully\n- Scores and feedback are generated\n- Candidate and company emails sent\n- Only for live submissions (test=0)\n\n**Security:**\n- Signed with HMAC-SHA256 using your webhook secret\n- Signature in `X-ErrorGolf-Signature` header as `sha256=<hex>`\n- Verify signature to ensure authenticity\n\n**Retry behavior:**\n- Up to 10 retries with exponential backoff\n- Initial retry after 10 minutes\n- 4xx errors are not retried (fix your endpoint)\n- 5xx errors trigger retries\n\n**Expected responses:**\n- Return 200 or 201 for success\n- Return 4xx for client errors (no retries)\n- Return 5xx for server errors (will retry)\n",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WebhookPayload"
+              },
+              "example": {
+                "event": "submission.completed",
+                "round_id": "6865d67ede0cf7e8fd94e4dd",
+                "company_id": "685f5bde928d7aad329fabd6",
+                "candidate_email": "ac@test.com",
+                "candidate_name": "Alex",
+                "timestamp": "2025-07-04T01:46:27.018Z",
+                "questions": [
+                  1,
+                  2,
+                  3
+                ],
+                "status": "analyzed",
+                "summary": "Analyzed 3 questions with 3 jaded reviewers. Overall: 447/90.",
+                "scores": {
+                  "overall": 74.6,
+                  "quality": 73.3,
+                  "creativity": 71.7,
+                  "ingenuity": 78.3,
+                  "humor": 58.3,
+                  "correctness": 83.3
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Webhook received and processed successfully"
+          },
+          "400": {
+            "description": "Invalid payload format (will not retry)"
+          },
+          "500": {
+            "description": "Server error (will retry up to 10 times)"
+          }
+        }
       }
     }
   }

@@ -1,55 +1,61 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
-  "name": "Mint Starter Kit",
+  "name": "ErrorGolf Documentation",
   "colors": {
     "primary": "#16A34A",
     "light": "#07C983",
     "dark": "#15803D"
   },
-  "favicon": "/favicon.svg",
+  "favicon": "/favicon.png",
   "navigation": {
     "tabs": [
       {
-        "tab": "Guides",
+        "tab": "For Eejits",
         "groups": [
           {
-            "group": "Get Started",
+            "group": "Basics",
             "pages": [
               "index",
-              "quickstart",
-              "development"
-            ]
-          },
-          {
-            "group": "Essentials",
-            "pages": [
-              "essentials/markdown",
-              "essentials/code",
-              "essentials/images",
-              "essentials/settings",
-              "essentials/navigation",
-              "essentials/reusable-snippets"
+              "webhooks",
+              "personalities",
+              "fasq"
             ]
           }
         ]
       },
       {
-        "tab": "API Reference",
+        "tab": "API, Kinda",
         "groups": [
           {
-            "group": "API Documentation",
+            "group": "API Masheen",
             "pages": [
               "api-reference/introduction"
             ]
           },
           {
-            "group": "Endpoint Examples",
+            "group": "Account",
             "pages": [
-              "api-reference/endpoint/get",
-              "api-reference/endpoint/create",
-              "api-reference/endpoint/delete",
-              "api-reference/endpoint/webhook"
+              "api-reference/endpoint/token",
+              "api-reference/endpoint/refresh",
+              "api-reference/endpoint/me"
+            ]
+          },
+          {
+            "group": "Playback",
+            "pages": [
+              "api-reference/endpoint/invite",
+              "api-reference/endpoint/playback",
+              "api-reference/endpoint/playback-detail"
+            ]
+          },
+          {
+            "group": "Settings",
+            "pages": [
+              "api-reference/endpoint/settings",
+              "api-reference/endpoint/update-settings",
+              "api-reference/endpoint/pause",
+              "api-reference/endpoint/unpause"
             ]
           }
         ]
@@ -58,45 +64,45 @@
     "global": {
       "anchors": [
         {
-          "anchor": "Documentation",
-          "href": "https://mintlify.com/docs",
+          "anchor": "Docs",
+          "href": "https://docs.errorgolf.com",
           "icon": "book-open-cover"
         },
         {
-          "anchor": "Community",
-          "href": "https://mintlify.com/community",
-          "icon": "slack"
+          "anchor": "Clubhouse Dashboard",
+          "href": "https://errorgolf.com/clubhouse",
+          "icon": "martini-glass"
         },
         {
-          "anchor": "Blog",
-          "href": "https://mintlify.com/blog",
-          "icon": "newspaper"
+          "anchor": "Start A Round",
+          "href": "https://errorgolf.com/course",
+          "icon": "golf-club"
         }
       ]
     }
   },
   "logo": {
-    "light": "/logo/light.svg",
-    "dark": "/logo/dark.svg"
+    "light": "/logo/light.png",
+    "dark": "/logo/dark.png"
   },
   "navbar": {
     "links": [
       {
-        "label": "Support",
-        "href": "mailto:hi@mintlify.com"
+        "label": "Emotional Support",
+        "href": "mailto:support@errorgolf.com"
       }
     ],
     "primary": {
       "type": "button",
-      "label": "Dashboard",
-      "href": "https://dashboard.mintlify.com"
+      "label": "Clobhouse",
+      "href": "https://errorgolf.com/clubhouse"
     }
   },
   "footer": {
     "socials": {
-      "x": "https://x.com/mintlify",
-      "github": "https://github.com/mintlify",
-      "linkedin": "https://linkedin.com/company/mintlify"
+      "x": "https://x.com/teamerrorgolf",
+      "github": "https://github.com/errorgolf-devops",
+      "linkedin": "https://linkedin.com/company/errorgolf"
     }
   }
 }
